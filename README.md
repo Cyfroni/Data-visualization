@@ -1,6 +1,6 @@
 # Data Visualization example
 
-Simple data visualization tool that gets data from anime-facts-rest-api(https://https://chandan-02.github.io/anime-facts-rest-api/).
+Simple data visualization tool that gets data from anime-facts-rest-api(https://chandan-02.github.io/anime-facts-rest-api/).
 
 On the main page a user can choose an anime and a letter.
 An application fetches facts about the chosen anime and creates a histogram based on the chosen letter
