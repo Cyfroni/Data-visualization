@@ -3,61 +3,65 @@ import React, { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { VictoryPie } from "victory";
-import { Anime, Fact, fetchAnimeFacts, fetchAnimeList } from "./api";
+import {
+  Character, fetchCharacterList, fetchCharacterQuotes, Quote
+} from "./api";
 
 const lettersToChoose = ["e", "a", "r", "i", "o", "t", "n", "s"];
 
 function App() {
-  const [animeList, setAnimeList] = useState([] as Anime[]);
-  const [animeName, setAnimeName] = useState("");
-  const [animeFacts, setAnimeFacts] = useState([] as Fact[]);
+  const [characterList, setCharacterList] = useState([] as Character[]);
+  const [characterName, setCharacterName] = useState("");
+  const [characterQuotes, setCharacterQuotes] = useState([] as Quote[]);
   const [countedLetter, setCountedLetter] = useState(lettersToChoose[0]);
 
-  const loadAnimeList = async () => {
-    const animeList = await fetchAnimeList();
-    setAnimeList(animeList);
-    setAnimeName(animeList[0].anime_name);
+  const loadCharacterList = async () => {
+    const characterList = await fetchCharacterList();
+    setCharacterList(characterList);
+    setCharacterName(characterList[0].name);
   };
 
-  const loadAnimeFacts = async (animeName: string) => {
-    const animeFacts = await fetchAnimeFacts(animeName);
-    setAnimeFacts(animeFacts);
+  const loadCharacterQuotes = async (characterName: string) => {
+    const characterQuotes = await fetchCharacterQuotes(characterName);
+    setCharacterQuotes(characterQuotes);
   };
 
   useEffect(() => {
-    loadAnimeList();
+    loadCharacterList();
   }, []);
 
   useEffect(() => {
-    if (animeName !== "") {
-      loadAnimeFacts(animeName);
+    if (characterName !== "") {
+      loadCharacterQuotes(characterName);
     }
-  }, [animeName]);
+  }, [characterName]);
 
   const lengthToQuantityMap = {} as { [length: number]: number };
 
-  animeFacts.forEach(({ fact }) => {
-    const match = fact.match(new RegExp(countedLetter, "gi"));
+  characterQuotes.forEach(({ quote }) => {
+    const match = quote.match(new RegExp(countedLetter, "gi"));
     const length = match ? match.length : 0;
     const quantity = lengthToQuantityMap[length];
     lengthToQuantityMap[length] = quantity ? quantity + 1 : 1;
   });
 
   const data = Object.entries(lengthToQuantityMap).map(([x, y]) => ({ x, y }));
-
+  
   return (
     <div className="container">
       <h1 className="text-center">
-        Histogram of letter {countedLetter} in facts from {animeName} anime
+        Histogram of letter {countedLetter} in {characterName}'s quotes
       </h1>
-      <Row>
+      <Row style={{ height: "70vh" }}>
         <Col lg={4} sm={12} className="my-auto">
           <Form.Group className="mb-3">
-            <Form.Label>Anime</Form.Label>
-            <Form.Select onChange={(event) => setAnimeName(event.target.value)}>
-              {animeList.map(({ anime_id, anime_name }) => (
-                <option key={anime_id} value={anime_name}>
-                  {anime_name}
+            <Form.Label>Character</Form.Label>
+            <Form.Select
+              onChange={(event) => setCharacterName(event.target.value)}
+            >
+              {characterList.map(({ char_id, name }) => (
+                <option key={char_id} value={name}>
+                  {name}
                 </option>
               ))}
             </Form.Select>
@@ -75,8 +79,12 @@ function App() {
             </Form.Select>
           </Form.Group>
         </Col>
-        <Col>
-          <VictoryPie data={data} />
+        <Col className="my-auto">
+          {data.length === 0 ? (
+            <h2 className="text-center">no quotes to display</h2>
+          ) : (
+            <VictoryPie data={data} />
+          )}
         </Col>
       </Row>
     </div>

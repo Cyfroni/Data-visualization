@@ -1,26 +1,25 @@
 import axios from "axios";
 
 const client = axios.create({
-  baseURL: "https://anime-facts-rest-api.herokuapp.com/api/v1",
+  baseURL: "https://breakingbadapi.com/api",
 });
 
-export interface Anime {
-  anime_id: number;
-  anime_name: string;
-  anime_img: string;
+export interface Character {
+  char_id: number;
+  name: string;
 }
 
-export const fetchAnimeList = async () => {
-  const response = await client.get("/");
-  return response.data.data as Anime[];
+export const fetchCharacterList = async () => {
+  const response = await client.get<Character[]>("/characters");
+  return response.data;
 };
 
-export interface Fact {
-  fact_id: number;
-  fact: string;
+export interface Quote {
+  quote_id: number;
+  quote: string;
 }
 
-export const fetchAnimeFacts = async (animeName: string) => {
-  const response = await client.get("/" + animeName);
-  return response.data.data as Fact[];
+export const fetchCharacterQuotes = async (characterName: string) => {
+  const response = await client.get<Quote[]>("/quote", { params: { author: characterName } });
+  return response.data;
 };
